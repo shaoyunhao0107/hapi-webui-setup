@@ -17,8 +17,7 @@ bash scripts/verify.sh --spawn             # 实测：网页会话真跑 Bash/Wr
 
 远程服务器：
 ```bash
-scp -r hapi-webui-setup user@host:/tmp/
-ssh user@host 'bash /tmp/hapi-webui-setup/scripts/install.sh --service && bash /tmp/hapi-webui-setup/scripts/verify.sh --spawn'
+ssh user@host 'git clone https://github.com/shaoyunhao0107/hapi-webui-setup.git /tmp/hapi-webui-setup && bash /tmp/hapi-webui-setup/scripts/install.sh --service && bash /tmp/hapi-webui-setup/scripts/verify.sh --spawn'
 ```
 
 打开 `http://<机器IP>:3006`，Access Token 用这条命令查：
@@ -29,7 +28,7 @@ python3 -c "import json;print(json.load(open('$HOME/.hapi/settings.json'))['cliA
 ## 作为 Claude Code skill 使用
 
 ```bash
-ln -sfn "$PWD" ~/.claude/skills/hapi-webui
+ln -sfn "$PWD" ~/.claude/skills/hapi-webui-setup
 ```
 
 详细说明（权限模式、终端/网页交接、防封号要点、API 速查、踩坑）见 [SKILL.md](SKILL.md)。

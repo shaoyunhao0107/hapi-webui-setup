@@ -1,5 +1,5 @@
 ---
-name: hapi-webui
+name: hapi-webui-setup
 description: 在任意机器（macOS / Linux / Windows 服务器）上安装 HAPI（tiann/hapi），把本机官方 claude CLI 包成一个 0.0.0.0 可访问的 Web UI，复用本机已登录的 Claude Code，不重新登录。包含一键安装脚本（hub 监听 0.0.0.0 + runner + 可选开机自启）、实测验证脚本（网页新建会话真跑 Bash/Write/Read）、token 获取、权限模式选择、终端与网页交接、防封号要点和踩坑。触发词：HAPI、hapi、hapi claude、Claude Code 网页版、Claude 网页 UI、手机远程用 Claude Code、0.0.0.0 访问 Claude、给服务器装 Claude webui。
 ---
 
@@ -7,7 +7,7 @@ description: 在任意机器（macOS / Linux / Windows 服务器）上安装 HAP
 
 目标：在目标机器上让浏览器（手机、其他电脑）通过 `http://<机器IP>:3006` 使用这台机器上的**官方 claude CLI**，复用它已有的登录，出口就是这台机器。
 
-> 2026-11-08 在办公室 Mac（Intel / macOS 26.7.1，claude 2.1.319，HAPI v0.34.4）上全流程实测通过。
+> 2026-11-08 在 macOS 26.7.1（Intel，claude 2.1.319，HAPI v0.34.4）上全流程实测通过。
 
 ## 为什么选 HAPI（结论，不用每次重新评估）
 
@@ -31,7 +31,7 @@ bash scripts/install.sh --service                        # 另外配开机自启
 3. 启动 `hapi runner start --workspace-root <dir>`（网页新建会话靠它；只能浏览、新建这些目录）
 4. 检查 `/health`、局域网 IP 能否访问，最后打印访问地址
 
-远程服务器用法：先 `scp -r hapi-webui user@host:/tmp/`，再 `ssh user@host 'bash /tmp/hapi-webui/scripts/install.sh --service'`。
+远程服务器用法：`ssh user@host 'git clone https://github.com/shaoyunhao0107/hapi-webui-setup.git /tmp/hapi-webui-setup && bash /tmp/hapi-webui-setup/scripts/install.sh --service'`。
 
 ## Windows
 
@@ -67,7 +67,6 @@ bash scripts/verify.sh --spawn    # 另外从网页 API 新建一个会话，让
 - **Claude 没有 PTY 模式**：spawn 接口的 `startingMode: pty` 对 Claude 无效（`cli/src/claude/loop.ts` 没接 runPty）。不要再推荐这个选项。
 - **交接**：终端会话收到网页发来的消息后，会切到远程模式，终端显示 HAPI 的简化界面；在终端**连按两下空格**切回原版界面，上下文不丢。同一时间只有一边在控制。
 - 一定要在网页上用原版界面：会话页的 Terminal 标签里运行 `tmux new -A -s cc 'cd ~/projectai && hapi claude'`（未实测）。
-- 用户的选择（2026-11-08）：主要从网页新建会话，方便手机和其他电脑访问。
 
 ## 权限模式（网页上的 Permission Mode）
 
@@ -79,7 +78,7 @@ bash scripts/verify.sh --spawn    # 另外从网页 API 新建一个会话，让
 | `plan` | 只出方案不动手 |
 | `bypassPermissions` / **YOLO** | 全部放行，等于 `--dangerously-skip-permissions`，人不在电脑前时别开 |
 
-在终端用 `hapi claude` 启动时，会沿用本机 Claude Code 默认的权限模式（这台 Mac 默认是 bypassPermissions），需要的话在网页上改。
+在终端用 `hapi claude` 启动时，会沿用本机 Claude Code 默认的权限模式（如果本机默认是 bypassPermissions，网页上看到的也是），需要的话在网页上改。
 
 ## 防封号要点
 
